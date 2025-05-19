@@ -1,0 +1,128 @@
+Mã tổ hợp,Môn 1,Môn 2,Môn 3
+A00,Toán,Vật lý,Hóa học
+A01,Toán,Vật lý,Ngoại ngữ
+A02,Toán,Vật lí,Sinh học
+A03,Toán,Vật lý,Lịch sử
+A04,Toán,Vật lý,Địa lí
+A05,Toán,Hóa học,Lịch sử
+A06,Toán,Hóa học,Địa lí
+A07,Toán,Lịch sử,Địa lí
+A08,Toán,Lịch sử,GDCD
+A09,Toán,Địa lí,GDCD
+A10,Toán,Vật lý,GDCD
+A11,Toán,Hóa học,GDCD
+A12,Toán,KHTN,KHXH
+A14,Toán,KHTN,Địa lí
+A15,Toán,KHTN,GDCD
+A16,Toán,KHTN,Văn
+A17,Toán,KHXH,Vật lý
+A18,Toán,KHXH,Hóa học
+B00,Toán,Hóa học,Sinh học
+B01,Toán,Sinh học,Lịch sử
+B02,Toán,Sinh học,Địa lí
+B03,Toán,Sinh học,Văn
+B04,Toán,Sinh học,GDCD
+B05,Toán,Sinh học,KHXH
+B08,Toán,Sinh học,Ngoại ngữ
+C00,Văn,Lịch sử,Địa lí
+C01,Văn,Toán,Vật lí
+C02,Văn,Toán,Hóa học
+C03,Văn,Toán,Lịch sử
+C04,Văn,Toán,Địa lí
+C05,Văn,Vật lí,Hóa học
+C06,Văn,Vật lí,Sinh học
+C07,Văn,Vật lí,Lịch sử
+C08,Văn,Hóa học,Sinh
+C09,Văn,Vật lí,Địa lí
+C10,Văn,Hóa học,Lịch sử
+C12,Văn,Sinh học,Lịch sử
+C13,Văn,Sinh học,Địa
+C14,Văn,Toán,GDCD
+C15,Văn,Toán,KHXH
+C16,Văn,Vật lí,GDCD
+C17,Văn,Hóa học,GDCD
+C18,Văn,Sinh học,GDCD
+C19,Văn,Lịch sử,GDCD
+C20,Văn,Địa lí,GDCD
+D01,Văn,Toán,Ngoại ngữ
+D02,Văn,Toán,Ngoại ngữ
+D03,Văn,Toán,Ngoại ngữ
+D04,Văn,Toán,Ngoại ngữ
+D05,Văn,Toán,Ngoại ngữ
+D06,Văn,Toán,Ngoại ngữ
+D07,Toán,Hóa học,Ngoại ngữ
+D08,Toán,Sinh học,Ngoại ngữ
+D09,Toán,Lịch sử,Ngoại ngữ
+D10,Toán,Địa lí,Ngoại ngữ
+D11,Văn,Vật lí,Ngoại ngữ
+D12,Văn,Hóa học,Ngoại ngữ
+D13,Văn,Sinh học,Ngoại ngữ
+D14,Văn,Lịch sử,Ngoại ngữ
+D15,Văn,Địa lí,Ngoại ngữ
+D16,Toán,Địa lí,Ngoại ngữ
+D17,Toán,Địa lí,Ngoại ngữ
+D18,Toán,Địa lí,Ngoại ngữ
+D19,Toán,Địa lí,Ngoại ngữ
+D20,Toán,Địa lí,Ngoại ngữ
+D21,Toán,Hóa học,Ngoại ngữ
+D22,Toán,Hóa học,Ngoại ngữ
+D23,Toán,Hóa học,Ngoại ngữ
+D24,Toán,Hóa học,Ngoại ngữ
+D25,Toán,Hóa học,Ngoại ngữ
+D26,Toán,Vật lí,Ngoại ngữ
+D27,Toán,Vật lí,Ngoại ngữ
+D28,Toán,Vật lí,Ngoại ngữ
+D29,Toán,Vật lí,Ngoại ngữ
+D30,Toán,Vật lí,Ngoại ngữ
+D31,Toán,Sinh học,Ngoại ngữ
+D32,Toán,Sinh học,Ngoại ngữ
+D33,Toán,Sinh học,Ngoại ngữ
+D34,Toán,Sinh học,Ngoại ngữ
+D35,Toán,Sinh học,Ngoại ngữ
+D41,Văn,Địa lí,Ngoại ngữ
+D42,Văn,Địa lí,Ngoại ngữ
+D43,Văn,Địa lí,Ngoại ngữ
+D44,Văn,Địa lí,Ngoại ngữ
+D45,Văn,Địa lí,Ngoại ngữ
+D52,Văn,Vật lí,Ngoại ngữ
+D54,Văn,Vật lí,Ngoại ngữ
+D55,Văn,Vật lí,Ngoại ngữ
+D61,Văn,Lịch sử,Ngoại ngữ
+D62,Văn,Lịch sử,Ngoại ngữ
+D63,Văn,Lịch sử,Ngoại ngữ
+D64,Văn,Lịch sử,Ngoại ngữ
+D65,Văn,Lịch sử,Ngoại ngữ
+D66,Văn,GDCD,Ngoại ngữ
+D68,Văn,GDCD,Ngoại ngữ
+D69,Văn,GDCD,Ngoại ngữ
+D70,Văn,GDCD,Ngoại ngữ
+D72,Văn,KHTN,Ngoại ngữ
+D73,Văn,KHTN,Ngoại ngữ
+D74,Văn,KHTN,Ngoại ngữ
+D75,Văn,KHTN,Ngoại ngữ
+D76,Văn,KHTN,Ngoại ngữ
+D77,Văn,KHTN,Ngoại ngữ
+D78,Văn,KHXH,Ngoại ngữ
+D79,Văn,KHXH,Ngoại ngữ
+D80,Văn,KHXH,Ngoại ngữ
+D81,Văn,KHXH,Ngoại ngữ
+D82,Văn,KHXH,Ngoại ngữ
+D83,Văn,KHXH,Ngoại ngữ
+D84,Toán,GDCD,Ngoại ngữ
+D85,Toán,GDCD,Ngoại ngữ
+D86,Toán,GDCD,Ngoại ngữ
+D87,Toán,GDCD,Ngoại ngữ
+D88,Toán,GDCD,Ngoại ngữ
+D90,Toán,KHTN,Ngoại ngữ
+D91,Toán,KHTN,Ngoại ngữ
+D92,Toán,KHTN,Ngoại ngữ
+D93,Toán,KHTN,Ngoại ngữ
+D94,Toán,KHTN,Ngoại ngữ
+D95,Toán,KHTN,Ngoại ngữ
+D96,Toán,KHXH,Anh
+D97,Toán,KHXH,Ngoại ngữ
+D98,Toán,KHXH,Ngoại ngữ
+D99,Toán,KHXH,Ngoại ngữ
+DD0,Toán,KHXH,Ngoại ngữ
+DD2,Ngữ văn,Toán,Ngoại ngữ
+DH1,Ngữ văn,Địa lí,Ngoại ngữ
