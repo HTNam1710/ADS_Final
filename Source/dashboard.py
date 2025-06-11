@@ -1,12 +1,13 @@
 import streamlit as st
 import pandas as pd
-# import matplotlib.pyplot as plt
-# import seaborn as sns
 import pydeck as pdk
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit.components.v1 as components
 from streamlit_echarts import st_echarts
+
+import joblib
+import numpy as np
 
 st.set_page_config(layout="wide")
 
@@ -19,7 +20,7 @@ df = load_data()
 df["Điểm chuẩn"] = df["Điểm chuẩn"].fillna(0)
 
 # Tabs chính
-tab1, tab2 = st.tabs(["📊 Phân tích điểm chuẩn", "📚 Gợi ý chọn trường"])
+tab1, tab2, tab3 = st.tabs(["📊 Phân tích điểm chuẩn", "📚 Gợi ý chọn trường", "🎓 Gợi Ý Ngành Học"])
 
 # --------------------------- TAB 1: Dashboard điểm chuẩn tổng quan ---------------------------
 st.markdown('<div id="capture-this">', unsafe_allow_html=True)
@@ -205,7 +206,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # --------------------------- TAB 2: Gợi ý chọn trường (để mở rộng sau) ---------------------------
 # --------------------------- TAB 2: Gợi ý chọn trường ---------------------------
 with tab2:
-    st.markdown("## 📚 GỢI Ý CHỌN TRƯỜNG PHÙ HỢP")
+    st.markdown("## 📚 THAM KHẢO TRƯỜNG PHÙ HỢP DỰA TRÊN DỮ LIỆU ĐIỂM CHUẨN NĂM 2024")
 
     # Init session state
     if "current_drill_path" not in st.session_state:
@@ -214,24 +215,31 @@ with tab2:
         st.session_state.clicked_node_temp = None
     if "previous_selected_nhom" not in st.session_state:
         st.session_state.previous_selected_nhom = None
+    if "reset_filters" not in st.session_state:
+        st.session_state.reset_filters = False
 
     df_2024 = df[df["Năm"] == 2024].copy()
 
     # ==== Filter dòng trên cùng ====
     col1, col2, col3, col4 = st.columns(4)
 
-    selected_region = col1.selectbox("Khu vực", ["All"] + sorted(df_2024["Khu vực"].dropna().unique()), key="region_tab2")
-    selected_method = col2.selectbox("Phương thức", ["All"] + sorted(df_2024["Loại điểm"].dropna().unique()), key="method_tab2")
-    selected_tohop = col3.selectbox("Tổ hợp", ["All"] + sorted(df_2024["Tổ hợp"].dropna().unique()), key="tohop_tab2")
+    if st.session_state.reset_filters:
+        selected_region = "All"
+        selected_method = "All"
+        selected_tohop = "All"
+        selected_score_range = (float(df_2024["Điểm chuẩn"].min()), float(df_2024["Điểm chuẩn"].max()))
+        st.session_state.reset_filters = False
+    else:
+        selected_region = col1.selectbox("Khu vực", ["All"] + sorted(df_2024["Khu vực"].dropna().unique()), key="region_tab2")
+        selected_method = col2.selectbox("Phương thức", ["All"] + sorted(df_2024["Loại điểm"].dropna().unique()), key="method_tab2")
+        selected_tohop = col3.selectbox("Tổ hợp", ["All"] + sorted(df_2024["Tổ hợp"].dropna().unique()), key="tohop_tab2")
 
-    min_score = float(df_2024["Điểm chuẩn"].min())
-    max_score = float(df_2024["Điểm chuẩn"].max())
-    default_range = (min_score, max_score)
-
-    selected_score_range = col4.slider(
-        "Điểm xét tuyển", min_value=min_score, max_value=max_score,
-        value=default_range, step=0.05, key="score_tab2"
-    )
+        min_score = float(df_2024["Điểm chuẩn"].min())
+        max_score = float(df_2024["Điểm chuẩn"].max())
+        selected_score_range = col4.slider(
+            "Điểm xét tuyển", min_value=min_score, max_value=max_score,
+            value=(min_score, max_score), step=0.05, key="score_tab2"
+        )
 
     # ==== Apply filter ====
     df_filtered = df_2024[
@@ -262,26 +270,49 @@ with tab2:
     else:
         df_nhom = df_filtered[df_filtered["Nhóm ngành"] == selected_nhom]
 
+    # ==== Show Metrics trên top ====
+    df_drill_current = df_nhom.copy()
+    if len(st.session_state.current_drill_path) >= 1:
+        df_drill_current = df_drill_current[df_drill_current["Phân ngành"] == st.session_state.current_drill_path[0]]
+    if len(st.session_state.current_drill_path) >= 2:
+        df_drill_current = df_drill_current[df_drill_current["Tên Trường"] == st.session_state.current_drill_path[1]]
+    if len(st.session_state.current_drill_path) >= 3:
+        if st.session_state.current_drill_path[2].startswith("Điểm:"):
+            # Chỉ giữ lại filter đến Tên Ngành hiện tại:
+            selected_nganh = st.session_state.current_drill_path[2].split("(Tổ hợp")[0].replace("Điểm: ","").strip()
+            # Lấy từ path[2-1]:
+            selected_nganh = st.session_state.current_drill_path[2-1]
+            df_drill_current = df_drill_current[df_drill_current["Tên Ngành"] == selected_nganh]
+        else:
+            df_drill_current = df_drill_current[df_drill_current["Tên Ngành"] == st.session_state.current_drill_path[2]]
+
+
+    colm1, colm2, colm3, colm4 = st.columns(4)
+    colm1.metric("Số phân ngành", df_drill_current["Phân ngành"].nunique())
+    colm2.metric("Số ngành phù hợp", df_drill_current["Tên Ngành"].nunique())
+    colm3.metric("Số trường", df_drill_current["Tên Trường"].nunique())
+    colm4.metric("Điểm chuẩn trung bình", f"{df_drill_current['Điểm chuẩn'].mean():.2f}" if not df_drill_current.empty else "0.00")
+
     # ==== Breadcrumb + Button Reset ====
     st.markdown("### 🧭 Sankey:")
 
     col_breadcrumb = st.container()
     col_breadcrumb_cols = col_breadcrumb.columns(len(st.session_state.current_drill_path) + 1)
 
-    # Node 0: "Số ngành phù hợp"
     if col_breadcrumb_cols[0].button("Số ngành phù hợp"):
         st.session_state.current_drill_path = []
         st.rerun()
 
-    # Nodes tiếp theo
     for i, node in enumerate(st.session_state.current_drill_path):
         if col_breadcrumb_cols[i+1].button(node):
             st.session_state.current_drill_path = st.session_state.current_drill_path[:i+1]
             st.rerun()
 
-    if st.button("🔄 Reset"):
+    if st.button("🔄 Reset toàn bộ"):
         st.session_state.current_drill_path = []
         st.session_state.clicked_node_temp = None
+        st.session_state.previous_selected_nhom = "All"
+        st.session_state.reset_filters = True
         st.rerun()
 
     # ==== Build Sankey ====
@@ -301,14 +332,12 @@ with tab2:
 
         curveness = 0.3 if df_nhom.shape[0] < 200 else 0.2
         TOP_N = 10
-
         drill_depth = len(st.session_state.current_drill_path)
 
         if drill_depth == 0:
             add_node("Số ngành phù hợp")
             phan_nganh_count = df_nhom.groupby("Phân ngành")["Tên Ngành"].nunique().reset_index()
             phan_nganh_count = phan_nganh_count.sort_values(by="Tên Ngành", ascending=False).head(TOP_N)
-
             for _, row in phan_nganh_count.iterrows():
                 add_node(row["Phân ngành"])
                 sankey_links.append({
@@ -355,19 +384,25 @@ with tab2:
             sankey_links.append({
                 "source": selected_phan,
                 "target": selected_truong,
-                "value": int(df_nhom[df_nhom["Tên Trường"] == selected_truong]["Tên Ngành"].nunique())
+                "value": int(df_nhom[
+                    (df_nhom["Tên Trường"] == selected_truong) & (df_nhom["Phân ngành"] == selected_phan)
+                ]["Tên Ngành"].nunique())
             })
 
-            df_sub_truong = df_nhom[df_nhom["Tên Trường"] == selected_truong]
-            nganh_count = df_sub_truong.groupby("Tên Ngành")["Điểm chuẩn"].count().reset_index()
-            nganh_count = nganh_count.sort_values(by="Điểm chuẩn", ascending=False).head(TOP_N)
+            df_sub_truong = df_nhom[
+                (df_nhom["Tên Trường"] == selected_truong) & (df_nhom["Phân ngành"] == selected_phan)
+            ]
+            df_sub_truong_unique = df_sub_truong.drop_duplicates(subset=["Tên Ngành", "Tổ hợp", "Điểm chuẩn"])
+
+            nganh_count = df_sub_truong_unique.groupby("Tên Ngành").size().reset_index(name="Số dòng")
+            nganh_count = nganh_count.sort_values(by="Số dòng", ascending=False).head(TOP_N)
 
             for _, row_nganh in nganh_count.iterrows():
                 add_node(row_nganh["Tên Ngành"])
                 sankey_links.append({
                     "source": selected_truong,
                     "target": row_nganh["Tên Ngành"],
-                    "value": int(row_nganh["Điểm chuẩn"])
+                    "value": int(row_nganh["Số dòng"])
                 })
 
         elif drill_depth == 3:
@@ -388,18 +423,25 @@ with tab2:
             sankey_links.append({
                 "source": selected_phan,
                 "target": selected_truong,
-                "value": int(df_nhom[df_nhom["Tên Trường"] == selected_truong]["Tên Ngành"].nunique())
+                "value": int(df_nhom[
+                    (df_nhom["Tên Trường"] == selected_truong) & (df_nhom["Phân ngành"] == selected_phan)
+                ]["Tên Ngành"].nunique())
             })
             sankey_links.append({
                 "source": selected_truong,
                 "target": selected_nganh,
-                "value": int(df_nhom[df_nhom["Tên Ngành"] == selected_nganh]["Điểm chuẩn"].count())
+                "value": int(df_nhom[
+                    (df_nhom["Tên Ngành"] == selected_nganh) & (df_nhom["Tên Trường"] == selected_truong) & (df_nhom["Phân ngành"] == selected_phan)
+                ]["Điểm chuẩn"].count())
             })
 
-            df_sub_nganh = df_nhom[df_nhom["Tên Ngành"] == selected_nganh]
-            score_unique = df_sub_nganh["Điểm chuẩn"].unique()
-            for score in score_unique:
-                score_label = f"Điểm: {score:.2f}"
+            df_sub_nganh = df_nhom[
+                (df_nhom["Tên Ngành"] == selected_nganh) & (df_nhom["Tên Trường"] == selected_truong) & (df_nhom["Phân ngành"] == selected_phan)
+            ]
+            df_sub_nganh = df_sub_nganh.drop_duplicates(subset=["Tên Ngành", "Tổ hợp", "Điểm chuẩn"])
+
+            for _, row in df_sub_nganh.iterrows():
+                score_label = f"Điểm: {row['Điểm chuẩn']:.2f} (Tổ hợp {row['Tổ hợp']})"
                 add_node(score_label)
                 sankey_links.append({
                     "source": selected_nganh,
@@ -421,8 +463,8 @@ with tab2:
                         "show": True,
                         "fontSize": 12,
                         "color": "#fff",
-                        "overflow": "truncate",  # fix label dài
-                        "width": 200
+                        "overflow": "truncate",
+                        "width": 220
                     },
                     "data": sankey_nodes,
                     "links": sankey_links,
@@ -435,10 +477,7 @@ with tab2:
             ]
         }
 
-        events = {
-            "click": "function(params) { return params.name; }"
-        }
-
+        events = {"click": "function(params) { return params.name; }"}
         clicked_node_temp = st_echarts(option, height="600px", events=events)
 
         if clicked_node_temp is not None:
@@ -451,32 +490,15 @@ with tab2:
 
             if len(path) == 0 and node_name in list(df_nhom["Phân ngành"].dropna().unique()):
                 st.session_state.current_drill_path = [node_name]
-            elif len(path) == 1 and node_name in list(df_nhom["Tên Trường"].dropna().unique()):
+            elif len(path) == 1 and node_name in list(df_nhom["Tên Trường"].dropna().unique()) and (len(path) < 2 or node_name != path[1]):
                 st.session_state.current_drill_path.append(node_name)
-            elif len(path) == 2 and node_name in list(df_nhom["Tên Ngành"].dropna().unique()):
+            elif len(path) == 2 and node_name in list(df_nhom["Tên Ngành"].dropna().unique()) and (len(path) < 3 or node_name != path[2]):
                 st.session_state.current_drill_path.append(node_name)
             elif len(path) == 3 and node_name.startswith("Điểm:"):
                 st.session_state.current_drill_path = []
 
             st.session_state.clicked_node_temp = None
             st.rerun()
-
-    # ==== df_drill_current chuẩn ====
-    df_drill_current = df_nhom.copy()
-    if len(st.session_state.current_drill_path) >= 1:
-        df_drill_current = df_drill_current[df_drill_current["Phân ngành"] == st.session_state.current_drill_path[0]]
-    if len(st.session_state.current_drill_path) >= 2:
-        df_drill_current = df_drill_current[df_drill_current["Tên Trường"] == st.session_state.current_drill_path[1]]
-    if len(st.session_state.current_drill_path) >= 3:
-        df_drill_current = df_drill_current[df_drill_current["Tên Ngành"] == st.session_state.current_drill_path[2]]
-    # Nếu drill đến cấp Điểm (4 cấp) → không filter thêm → giữ df_drill_current theo Tên Ngành.
-
-    # ==== Show Metrics ====
-    colm1, colm2, colm3, colm4 = st.columns(4)
-    colm1.metric("Số phân ngành", df_drill_current["Phân ngành"].nunique())
-    colm2.metric("Số ngành phù hợp", df_drill_current["Tên Ngành"].nunique())
-    colm3.metric("Số trường", df_drill_current["Tên Trường"].nunique())
-    colm4.metric("Điểm chuẩn trung bình", f"{df_drill_current['Điểm chuẩn'].mean():.2f}" if not df_drill_current.empty else "0.00")
 
     # ==== Tổ hợp môn + Thông tin nhóm ngành ====
     col_bot_left, col_bot_right = st.columns([3, 1])
@@ -519,3 +541,108 @@ with tab2:
             st.metric("Điểm chuẩn cao nhất", "0.00")
             st.metric("Điểm chuẩn thấp nhất", "0.00")
 
+# --------------------------- TAB 3: Gợi ý ngành học phù hợp ---------------------------
+with tab3:
+    st.markdown("## 🎓 GỢI Ý NGÀNH HỌC PHÙ HỢP")
+    st.markdown("#### ✨ Hệ thống sẽ gợi ý các ngành học phù hợp dựa trên điểm bạn nhập vào các môn thi tốt nghiệp THPT.")
+    st.markdown("---")
+
+    # Load model & encoder & feature_cols
+    clf = joblib.load('model/clf_multilabel.pkl')
+    mlb = joblib.load('model/mlb_majors.pkl')
+    feature_cols = joblib.load('model/score.pkl')
+
+    # Thứ tự môn
+    ordered_subjects = [
+        'Toán', 'Văn', 'Ngoại ngữ',
+        'Lí', 'Hóa', 'Sinh',
+        'Sử', 'Địa', 'GDCD'
+    ]
+
+    # ==== Form nhập điểm ====
+    with st.form("score_form"):
+        st.write("### ✏️ Nhập điểm các môn (thang điểm 10):")
+
+        input_data = []
+
+        num_cols = 3
+        for i in range(0, len(ordered_subjects), num_cols):
+            cols = st.columns(num_cols)
+            for j, subject in enumerate(ordered_subjects[i:i+num_cols]):
+                with cols[j]:
+                    score = st.number_input(
+                        f"{subject}",
+                        min_value=0.0, max_value=10.0, value=5.0, step=0.1,
+                        key=f"{subject}_input"
+                    )
+                    input_data.append(score)
+
+        # Chọn số ngành muốn gợi ý
+        top_n = st.slider("Số ngành muốn gợi ý (Top N):", min_value=1, max_value=10, value=5, step=1)
+
+        # Submit button
+        submit_button = st.form_submit_button("🚀 Dự đoán ngành phù hợp")
+
+    # ==== Dự đoán khi submit form ====
+    if submit_button:
+        with st.spinner("⏳ Đang phân tích và gợi ý ngành phù hợp..."):
+            X_input = np.array(input_data).reshape(1, -1)
+            # predict_proba: lấy xác suất từng ngành
+            y_pred_proba = np.array([est.predict_proba(X_input)[:,1] for est in clf.estimators_]).T[0]
+
+            # Lấy top N ngành có xác suất cao nhất
+            top_indices = y_pred_proba.argsort()[::-1][:top_n]
+            top_scores = y_pred_proba[top_indices]
+            top_majors = mlb.classes_[top_indices]
+
+        st.markdown("---")
+        st.success(f"🎓 Top {top_n} ngành học gợi ý dành cho bạn:")
+
+        # ==== Giải thích cách tính độ phù hợp ====
+        st.markdown("""
+        ### ❓ Cách hiểu "độ phù hợp", "bias" và "đóng góp từng môn":
+
+        - Mỗi ngành có 1 mô hình Logistic Regression riêng.
+        - Công thức:  
+          `score_raw = Tổng đóng góp các môn + bias`
+        - Độ phù hợp = `sigmoid(score_raw) = 1 / (1 + exp(-score_raw))`
+        - Bias = ngưỡng ban đầu của ngành, nếu âm → ngành khó phù hợp; nếu dương → ngành dễ phù hợp.
+        - Đóng góp môn = Điểm môn × Hệ số môn.
+        - **Model luôn chọn ngành có độ phù hợp (P(y=1)) cao nhất, không chỉ dựa vào bias.**
+        """)
+
+        # ==== Hiển thị từng ngành + giải thích ====
+        def highlight_contrib(val):
+            color = 'green' if val > 0 else 'red'
+            return f'color: {color}'
+
+        for i, (major, score, idx) in enumerate(zip(top_majors, top_scores, top_indices)):
+            st.markdown(f"### {i+1}. **{major}** &nbsp; _({score:.2%} độ phù hợp)_")
+
+            # Lấy model estimator cho ngành này
+            estimator = clf.estimators_[idx]
+            coef = estimator.coef_[0]  # trọng số từng môn
+            intercept = estimator.intercept_[0]
+
+            # Tính đóng góp từng môn
+            contributions = X_input[0] * coef  # array đóng góp từng môn
+
+            # Tạo dataframe để hiện bảng
+            explain_df = pd.DataFrame({
+                'Môn': ordered_subjects,
+                'Điểm môn': X_input[0],
+                'Hệ số trọng số': coef,
+                'Đóng góp vào ngành': contributions
+            })
+
+            # Hiển thị bảng đẹp với màu
+            st.markdown("**🧐 Đóng góp từng môn:**")
+            st.table(explain_df.style.format({
+                'Điểm môn': '{:.1f}',
+                'Hệ số trọng số': '{:+.2f}',
+                'Đóng góp vào ngành': '{:+.2f}'
+            }).applymap(highlight_contrib, subset=['Đóng góp vào ngành']))
+
+            # Hiển thị intercept
+            st.markdown(f"*Bias ngành (intercept): {intercept:+.2f}*")
+            st.markdown("---")
