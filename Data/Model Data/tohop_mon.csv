@@ -1,0 +1,90 @@
+Tổ hợp,Môn 1,Môn 2,Môn 3
+A00,Toán,Lí,Hóa
+A01,Toán,Lí,Tiếng Anh
+A02,Toán,Lí,Sinh
+A07,Toán,Sử,Địa
+A08,Toán,Sử,GDCD
+A09,Toán,Địa,GDCD
+A16,Toán,KHTN,Văn
+B00,Toán,Hóa,Sinh
+B03,Toán,Sinh,Văn
+B08,Toán,Sinh,Tiếng Anh
+C00,Văn,Sử,Địa
+C01,Văn,Toán,Lí
+C02,Văn,Toán,Hóa
+C03,Văn,Toán,Sử
+C04,Văn,Toán,Địa
+C05,Văn,Lí,Hóa
+C07,Văn,Lí,Sử
+C08,Văn,Hóa,Sinh
+C10,Văn,Hóa,Sử
+C14,Văn,Toán,GDCD
+C15,Văn,Toán,KHXH
+C19,Văn,Sử,GDCD
+C20,Văn,Địa,GDCD
+D00,Văn,Toán,Ngoại ngữ
+D01,Văn,Toán,tiếng Anh
+D02,Văn,Toán,tiếng Nga
+D03,Văn,Toán,tiếng Pháp
+D04,Văn,Toán,tiếng Trung
+D05,Văn,Toán,Tiếng Đức
+D06,Văn,Toán,Tiếng Nhật
+D07,Toán,Hóa,Tiếng Anh
+D08,Toán,Sinh,Tiếng Anh
+D09,Toán,Sử,Tiếng Anh
+D10,Toán,Địa,Tiếng Anh
+D11,Văn,Lí,Tiếng Anh
+D12,Văn,Hóa,Tiếng Anh
+D13,Văn,Sinh,Tiếng Anh
+D14,Văn,Sử,Tiếng Anh
+D15,Văn,Địa,Tiếng Anh
+D16,Toán,Địa,Tiếng Đức
+D20,Toán,Địa,Tiếng Trung
+D23,Toán,Hóa,Tiếng Nhật
+D24,Toán,Hóa,Tiếng Pháp
+D26,Toán,Lí,Tiếng Đức
+D27,Toán,Lí,Tiếng Nga
+D28,Toán,Lí,Tiếng Nhật
+D29,Toán,Lí,Tiếng Pháp
+D30,Toán,Lí,Tiếng Trung
+D31,Toán,Sinh,Tiếng Đức
+D32,Toán,Sinh,Tiếng Nga
+D33,Toán,Sinh,Tiếng Nhật
+D34,Toán,Sinh,Tiếng Pháp
+D35,Toán,Sinh,Tiếng Trung
+D42,Văn,Địa,Tiếng Nga
+D43,Văn,Địa,Tiếng Nhật
+D44,Văn,Địa,Tiếng Pháp
+D45,Văn,Địa,Tiếng Trung
+D55,Văn,Lí,Tiếng Trung
+D63,Văn,Sử,Tiếng Nhật
+D64,Văn,Sử,Tiếng Pháp
+D65,Văn,Sử,Tiếng Trung
+D66,Văn,GDCD,Tiếng Anh
+D68,Văn,GDCD,Tiếng Nga
+D69,Văn,GDCD,Tiếng Nhật
+D70,Văn,GDCD,Tiếng Pháp
+D72,Văn,KHTN,Tiếng Anh
+D73,Văn,KHTN,Tiếng Đức
+D74,Văn,KHTN,Tiếng Nga
+D75,Văn,KHTN,Tiếng Nhật
+D76,Văn,KHTN,Tiếng Pháp
+D77,Văn,KHTN,Tiếng Trung
+D78,Văn,KHXH,Tiếng Anh
+D79,Văn,KHXH,Tiếng Đức
+D80,Văn,KHXH,Tiếng Nga
+D81,Văn,KHXH,Tiếng Nhật
+D82,Văn,KHXH,Tiếng Pháp
+D83,Văn,KHXH,Tiếng Trung
+D84,Toán,GDCD,Tiếng Anh
+D87,Toán,GDCD,Tiếng Pháp
+D88,Toán,GDCD,Tiếng Nhật
+D90,Toán,KHTN,Tiếng Anh
+D91,Toán,KHTN,Tiếng Pháp
+D92,Toán,KHTN,Tiếng Đức
+D93,Toán,KHTN,Tiếng Nga
+D94,Toán,KHTN,Tiếng Nhật
+D95,Toán,KHTN,Tiếng Trung
+D96,Toán,KHXH,Anh
+D97,Toán,KHXH,Tiếng Pháp
+DD2,Văn,Toán,Tiếng Hàn
