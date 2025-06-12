@@ -542,6 +542,15 @@ with tab2:
             st.metric("Điểm chuẩn thấp nhất", "0.00")
 
 # --------------------------- TAB 3: Gợi ý ngành học phù hợp ---------------------------
+reduced_df = pd.read_csv('model/reduced_df.csv')
+
+# Mapping ngành → list các trường có ngành đó
+major_to_schools = (
+    reduced_df.groupby('Tên ngành trúng tuyển')['Tên trường trúng tuyển']
+    .apply(lambda x: list(pd.unique(x)))
+    .to_dict()
+)
+
 with tab3:
     st.markdown("## 🎓 GỢI Ý NGÀNH HỌC PHÙ HỢP")
     st.markdown("#### ✨ Hệ thống sẽ gợi ý các ngành học phù hợp dựa trên điểm bạn nhập vào các môn thi tốt nghiệp THPT.")
@@ -604,11 +613,21 @@ with tab3:
 
         - Mỗi ngành có 1 mô hình Logistic Regression riêng.
         - Công thức:  
-          `score_raw = Tổng đóng góp các môn + bias`
+        `score_raw = Tổng đóng góp các môn + bias`
         - Độ phù hợp = `sigmoid(score_raw) = 1 / (1 + exp(-score_raw))`
-        - Bias = ngưỡng ban đầu của ngành, nếu âm → ngành khó phù hợp; nếu dương → ngành dễ phù hợp.
-        - Đóng góp môn = Điểm môn × Hệ số môn.
+        - **Bias** = ngưỡng ban đầu của ngành:
+            - Nếu âm → ngành mặc định khó phù hợp → cần đóng góp các môn tốt để được chọn.
+            - Nếu dương → ngành mặc định dễ phù hợp hơn.
+        - **Vì sao bias của nhiều ngành trong model này thường âm?**
+            - Đây là bài toán **multi-label** với rất nhiều ngành (~345 ngành).
+            - Trong dữ liệu, mỗi học sinh chỉ trúng tuyển 1–2 ngành → các ngành còn lại là 0.
+            - Do đó, khi học mô hình, Logistic Regression sẽ học rằng **mặc định P(y=1) của đa số ngành là rất thấp** → bias sẽ bị đẩy về âm → tránh predict sai dương cho các ngành không phù hợp.
+        - **Hệ số môn**: trọng số của mỗi môn do mô hình học từ dữ liệu, phản ánh mức độ và chiều hướng ảnh hưởng của môn lên độ phù hợp với ngành:
+            - Hệ số dương → môn càng cao → càng giúp tăng độ phù hợp.
+            - Hệ số âm → môn càng cao → càng làm giảm độ phù hợp.
+        - Đóng góp môn = `Điểm môn × Hệ số môn` → tác động thực tế của môn vào việc chọn ngành.
         - **Model luôn chọn ngành có độ phù hợp (P(y=1)) cao nhất, không chỉ dựa vào bias.**
+
         """)
 
         # ==== Hiển thị từng ngành + giải thích ====
@@ -617,17 +636,23 @@ with tab3:
             return f'color: {color}'
 
         for i, (major, score, idx) in enumerate(zip(top_majors, top_scores, top_indices)):
-            st.markdown(f"### {i+1}. **{major}** &nbsp; _({score:.2%} độ phù hợp)_")
+            # ==== Chọn trường phù hợp với ngành ====
+            schools = major_to_schools.get(major, [])
+            if schools:
+                # Ưu tiên: lấy trường xuất hiện nhiều nhất trong reduced_df cho ngành này
+                selected_school = pd.Series(schools).value_counts().idxmax()
+            else:
+                selected_school = "Không rõ trường"
 
-            # Lấy model estimator cho ngành này
+            # ==== Hiển thị Trường + Ngành + độ phù hợp ====
+            st.markdown(f"### {i+1}. **{selected_school} - {major}** &nbsp; _({score:.2%} độ phù hợp)_")
+
+            # ==== Phần giải thích như cũ ====
             estimator = clf.estimators_[idx]
-            coef = estimator.coef_[0]  # trọng số từng môn
+            coef = estimator.coef_[0]
             intercept = estimator.intercept_[0]
+            contributions = X_input[0] * coef
 
-            # Tính đóng góp từng môn
-            contributions = X_input[0] * coef  # array đóng góp từng môn
-
-            # Tạo dataframe để hiện bảng
             explain_df = pd.DataFrame({
                 'Môn': ordered_subjects,
                 'Điểm môn': X_input[0],
@@ -635,7 +660,6 @@ with tab3:
                 'Đóng góp vào ngành': contributions
             })
 
-            # Hiển thị bảng đẹp với màu
             st.markdown("**🧐 Đóng góp từng môn:**")
             st.table(explain_df.style.format({
                 'Điểm môn': '{:.1f}',
@@ -643,6 +667,5 @@ with tab3:
                 'Đóng góp vào ngành': '{:+.2f}'
             }).applymap(highlight_contrib, subset=['Đóng góp vào ngành']))
 
-            # Hiển thị intercept
             st.markdown(f"*Bias ngành (intercept): {intercept:+.2f}*")
             st.markdown("---")
