@@ -607,28 +607,28 @@ with tab3:
         st.markdown("---")
         st.success(f"🎓 Top {top_n} ngành học gợi ý dành cho bạn:")
 
-        # ==== Giải thích cách tính độ phù hợp ====
-        st.markdown("""
-        ### ❓ Cách hiểu "độ phù hợp", "bias" và "đóng góp từng môn":
+        # # ==== Giải thích cách tính độ phù hợp ====
+        # st.markdown("""
+        # ### ❓ Cách hiểu "độ phù hợp", "bias" và "đóng góp từng môn":
 
-        - Mỗi ngành có 1 mô hình Logistic Regression riêng.
-        - Công thức:  
-        `score_raw = Tổng đóng góp các môn + bias`
-        - Độ phù hợp = `sigmoid(score_raw) = 1 / (1 + exp(-score_raw))`
-        - **Bias** = ngưỡng ban đầu của ngành:
-            - Nếu âm → ngành mặc định khó phù hợp → cần đóng góp các môn tốt để được chọn.
-            - Nếu dương → ngành mặc định dễ phù hợp hơn.
-        - **Vì sao bias của nhiều ngành trong model này thường âm?**
-            - Đây là bài toán **multi-label** với rất nhiều ngành (~345 ngành).
-            - Trong dữ liệu, mỗi học sinh chỉ trúng tuyển 1–2 ngành → các ngành còn lại là 0.
-            - Do đó, khi học mô hình, Logistic Regression sẽ học rằng **mặc định P(y=1) của đa số ngành là rất thấp** → bias sẽ bị đẩy về âm → tránh predict sai dương cho các ngành không phù hợp.
-        - **Hệ số môn**: trọng số của mỗi môn do mô hình học từ dữ liệu, phản ánh mức độ và chiều hướng ảnh hưởng của môn lên độ phù hợp với ngành:
-            - Hệ số dương → môn càng cao → càng giúp tăng độ phù hợp.
-            - Hệ số âm → môn càng cao → càng làm giảm độ phù hợp.
-        - Đóng góp môn = `Điểm môn × Hệ số môn` → tác động thực tế của môn vào việc chọn ngành.
-        - **Model luôn chọn ngành có độ phù hợp (P(y=1)) cao nhất, không chỉ dựa vào bias.**
+        # - Mỗi ngành có 1 mô hình Logistic Regression riêng.
+        # - Công thức:  
+        # `score_raw = Tổng đóng góp các môn + bias`
+        # - Độ phù hợp = `sigmoid(score_raw) = 1 / (1 + exp(-score_raw))`
+        # - **Bias** = ngưỡng ban đầu của ngành:
+        #     - Nếu âm → ngành mặc định khó phù hợp → cần đóng góp các môn tốt để được chọn.
+        #     - Nếu dương → ngành mặc định dễ phù hợp hơn.
+        # - **Vì sao bias của nhiều ngành trong model này thường âm?**
+        #     - Đây là bài toán **multi-label** với rất nhiều ngành (~345 ngành).
+        #     - Trong dữ liệu, mỗi học sinh chỉ trúng tuyển 1–2 ngành → các ngành còn lại là 0.
+        #     - Do đó, khi học mô hình, Logistic Regression sẽ học rằng **mặc định P(y=1) của đa số ngành là rất thấp** → bias sẽ bị đẩy về âm → tránh predict sai dương cho các ngành không phù hợp.
+        # - **Hệ số môn**: trọng số của mỗi môn do mô hình học từ dữ liệu, phản ánh mức độ và chiều hướng ảnh hưởng của môn lên độ phù hợp với ngành:
+        #     - Hệ số dương → môn càng cao → càng giúp tăng độ phù hợp.
+        #     - Hệ số âm → môn càng cao → càng làm giảm độ phù hợp.
+        # - Đóng góp môn = `Điểm môn × Hệ số môn` → tác động thực tế của môn vào việc chọn ngành.
+        # - **Model luôn chọn ngành có độ phù hợp (P(y=1)) cao nhất, không chỉ dựa vào bias.**
 
-        """)
+        # """)
 
         # ==== Hiển thị từng ngành + giải thích ====
         def highlight_contrib(val):
