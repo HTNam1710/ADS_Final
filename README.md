@@ -97,6 +97,39 @@ Dữ liệu điểm chuẩn trong dự án được thu thập từ nhiều ngu�
 │   ├── model.ipynb
 ```
 
+
+## **Dữ liệu dán nhãn phục vụ huấn luyện model**
+
+File `Data/Model Data/dan_nhan_2021.csv` là dữ liệu nhãn đã qua xử lý (~2.3GB), do giới hạn GitHub không đưa vào repo.
+
+👉 Link tải file: [https://drive.google.com/drive/folders/1BahLLGfSsXJJoPHvSNfVnQHxuYVb_B5h](https://drive.google.com/drive/folders/1BahLLGfSsXJJoPHvSNfVnQHxuYVb_B5h)
+
+### Cách sử dụng:
+
+1️⃣ Tải file `dan_nhan_2021.csv` từ link trên.
+
+2️⃣ Tạo thư mục con theo đường dẫn sau trong project (nếu chưa có): `Data/Model Data/`
+
+3️⃣ Đặt file `dan_nhan_2021.csv` vào đúng vị trí: `Data/Model Data/dan_nhan_2021.csv`
+
+
+### Lưu ý:
+
+- **Để chạy Dashboard (`Source/dashboard.py`) → KHÔNG bắt buộc có file này.**
+- **File này chỉ cần khi muốn huấn luyện lại mô hình hoặc kiểm thử pipeline model.**
+- Nếu chỉ muốn chạy Dashboard để tham khảo → có thể clone repo và chạy ngay mà không cần file này.
+
+---
+
+## **Hướng dẫn lần đầu clone project**
+
+Khi bạn clone project này về lần đầu:
+
+- Nếu bạn chỉ muốn **xem Dashboard** → KHÔNG cần tải file `dan_nhan_2021.csv`, có thể chạy Dashboard bình thường.
+- Nếu bạn muốn **chạy lại quá trình huấn luyện model (folder Source/Model hoặc các notebook)** → hãy làm theo hướng dẫn phía trên để tải và đặt file `dan_nhan_2021.csv` vào đúng vị trí.
+
+👉 Lưu ý: nhóm đã thêm `.gitignore` để tránh lỡ commit file lớn này vào repo về sau.
+
 ## **Hướng dẫn chạy Dashboard**
 
 - Đầu tiên, clone project về từ GitHub:
