@@ -1,0 +1,8 @@
+streamlit
+plotly
+pydeck
+pandas
+numpy
+joblib
+scikit-learn
+streamlit-echarts
